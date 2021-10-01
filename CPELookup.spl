@@ -1,0 +1,11 @@
+|inputlookup combinedNVD.csv 
+|rename cve.CVE_data_meta.ID as CVE, configurations.nodes as CPE 
+|table CVE CPE
+|makemv delim="}, {" CPE
+|mvexpand CPE
+|rex field=CPE "vulnerable\': \w\w\w\w?\w,?\s\'cpe23Uri\':?\s\'cpe:2.3:\w:(?<Company>.+?):(?<Product>.+?):(?<Version>.+?):"
+|eval Company_Product_Version = Company + "_" + Product + "_" + Version 
+|stats delim=", " values(Company) as Company, values(Product) as Product, values(Version) as Version, values(Company_Product_Version) as Company_Product_Version by CVE
+|mvcombine Product
+|outputlookup CPELookup.csv
+
