@@ -1,0 +1,144 @@
+|inputlookup combinedNVD.csv 
+|rename cve.CVE_data_meta.ID as CVE 
+|rename cve.description.description_data as Description 
+|rename configurations.nodes as CPE
+
+|eval comment="Combine all metadata for more complete searches" |fields - comment
+|eval Metadata = Description + CPE
+
+|search Metadata="*driver*" OR Metadata="*.sys *" 
+|search CPE="*indows*" OR Metadata="*indows" OR  cve.references.reference_data="*indows*" 
+
+|eval comment="Exclude linux drivers and irrelevant hardware manufacturers" |fields - comment
+|search Metadata!="*inux*"
+|search Metadata!="*ndroid*" 
+|search Metadata!="*vidia*"
+|search Metadata!="*Ballistix MOD Utility*"
+|search Metadata!="*LG*"
+|search Metadata!="*SoftPerfect*"
+|search Metadata!="*Nuvoton*"
+|search Metadata!="*enovo*"
+|search Metadata!="*Schneider Electric*"
+
+|eval comment="Need to populate driver_vuln_type field" |fields - comment
+|eval driver_vuln_type = "" 
+
+|eval driver_vuln_type = case(match(Metadata,"Common Log File"),driver_vuln_type + "," + "Common Log File",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Bluetooth"),driver_vuln_type + "," + "Bluetooth",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Fast FAT"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"FASTFAT"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"File System"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"NFS"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Volume"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Drive Buffering SubSystem"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"Windows Container Isolation FS Filter Driver"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"Bind Filter"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"Cloud Files Mini Filter"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"DLP"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"Hard Disk"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"torage"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"Windows cleaning assistant"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"LUAFV"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"WIBU-SYSTEMS"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type) 
+|eval driver_vuln_type = case(match(Metadata,"FS"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"artition"),driver_vuln_type + "," + "File System",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"anti"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Anti"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"McAfee"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"rootkit protection"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Trend Micro"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Acronis"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Fortinet"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Armadito"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Symantec"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Norton"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Sophos"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Kaspersky"),driver_vuln_type + "," + "Antivirus",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Windows Kernel-Mode Driver Elevation of Privilege"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The kernel-mode drivers in Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The Windows kernel mode driver in Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The kernel-mode driver in Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The Microsoft Windows Kernel Mode Driver on Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The Windows Kernel-Mode Drivers component on Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"A kernel-mode driver in Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The kernel-mode drivers in Windows Server"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"The kernel-mode drivers in Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"in the kernel-mode drivers in Microsoft Windows"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"An elevation of privilege vulnerability exists in Windows when the Windows kernel-mode driver fails to properly handle objects in memory"),driver_vuln_type + "," + "Generic KMDF",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"irewall"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Winsock"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"WinSock"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"atagram"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"TCP"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"WPA"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Network"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"VPN"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"owser.sys"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"HTTP"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"vpnva-6.sys"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"NDProxy.sys"),driver_vuln_type + "," + "Network Stack",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"GDI"),driver_vuln_type + "," + "Graphics",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"aphics"),driver_vuln_type + "," + "Graphics",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"isplay"),driver_vuln_type + "," + "Graphics",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"rinter"),driver_vuln_type + "," + "Printer",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"PCAUSA"),driver_vuln_type + "," + "Printer",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"iPrint"),driver_vuln_type + "," + "Printer",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"CPUID CPU-Z"),driver_vuln_type + "," + "Third Party Monitor",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Synapse"),driver_vuln_type + "," + "Third Party Monitor",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Intel"),driver_vuln_type + "," + "Ubiquitous Hardware",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"AMD"),driver_vuln_type + "," + "Ubiquitous Hardware",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Power Management"),driver_vuln_type + "," + "Power Management",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"nergy"),driver_vuln_type + "," + "Power Management",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Virtual"),driver_vuln_type + "," + "Virtualization",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"VM"),driver_vuln_type + "," + "Virtualization",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"font"),driver_vuln_type + "," + "Font",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"Font"),driver_vuln_type + "," + "Font",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"rypt"),driver_vuln_type + "," + "Crypto",1=1,driver_vuln_type)
+|eval driver_vuln_type = case(match(Metadata,"cng.sys"),driver_vuln_type + "," + "Crypto",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"NETBIOS"),driver_vuln_type + "," + "NETBIOS",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Reflector"),driver_vuln_type + "," + "Reflector",1=1,driver_vuln_type) 
+
+|eval driver_vuln_type = case(match(Metadata,"SMB"),driver_vuln_type + "," + "SMB",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"win32k.sys"),driver_vuln_type + "," + "win32k.sys???",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Windows Optimization Master"),driver_vuln_type + "," + "Windows Optimization Master???",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"onsole"),driver_vuln_type + "," + "Console",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"TPM"),driver_vuln_type + "," + "TPM",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Windows Security Feature Bypass Vulnerability"),driver_vuln_type + "," + "Windows Security Feature Bypass Vulnerability",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Teradici PCOIP Software Agent"),driver_vuln_type + "," + "Third Party Remote",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"MSRPC"),driver_vuln_type + "," + "MSRPC",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"HID"),driver_vuln_type + "," + "HID",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"hrome"),driver_vuln_type + "," + "Web Browser",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"Transaction Manager"),driver_vuln_type + "," + "Transaction Manager???",1=1,driver_vuln_type)
+
+|eval driver_vuln_type = case(match(Metadata,"audio"),driver_vuln_type + "," + "udio",1=1,driver_vuln_type)
+
+|eval comment="Around 50 I couldn't assign to a category" |fields - comment
+|fillnull driver_vuln_type value="Misc" 
+
+|eval comment="Delete leading comment, can be made into MV field with comma delim" |fields - comment
+|rex field=driver_vuln_type "^,(?<driver_vuln_type>.*)"
+
+|outputlookup windows_driver_vulns.csv 

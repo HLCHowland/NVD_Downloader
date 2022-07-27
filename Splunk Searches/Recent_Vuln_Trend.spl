@@ -1,0 +1,4 @@
+|inputlookup windows_driver_vulns.csv 
+|search CVE = "*2019*" OR CVE = "*2020*" OR CVE = "*2021*" OR CVE = "*2022*" 
+|replace "Windows Optimization Master" with "Optomization Master" in driver_vuln_type 
+|top driver_vuln_type limit=10
